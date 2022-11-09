@@ -130,7 +130,7 @@
         "destination": {
           "endpointType": "WebHook",
           "properties": {
-            "endpointUrl": "[concat('https://', parameters('webAppName'), '.azurewebsites.net/incomingcall')]"
+            "endpointUrl": "[concat('https:\/\/', parameters('webAppName'), '.azurewebsites.net\/incomingcall')]"
           }
         },
         "eventDeliverySchema": "EventGridSchema",
