@@ -48,6 +48,16 @@
         "description": "Provide name of your Azure Communication Services resource. If you do not have Azure Communication Resource, Please provision first."
       }
     },
+    "provisionSystemTopic": {
+        "type": "string",
+        "allowedValues": [
+            "Yes",
+            "No"
+        ],
+        "metadata": {
+            "description": "If you do not have event grid topic associated with ACS, say YES. If you already have the topic associated with your ACS, say NO."
+        }
+    },
     "systemTopicName": {
       "type": "string",
       "metadata": {
@@ -125,6 +135,7 @@
       ]
     },
     {
+      "condition": "[equals(parameters('provisionSystemTopic'), 'Yes')]",
       "type": "Microsoft.EventGrid/systemTopics",
       "apiVersion": "2021-06-01-preview",
       "name": "[parameters('systemTopicName')]",
