@@ -37,7 +37,7 @@
     },
     "branch": {
       "type": "string",
-      "defaultValue": "master",
+      "defaultValue": "main",
       "metadata": {
         "description": "The branch of the GitHub repository to use."
       }
