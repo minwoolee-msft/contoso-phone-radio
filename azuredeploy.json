@@ -1,99 +1,145 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.1",
-    "parameters": {
-        "webAppName": {
-            "type": "string",
-            "defaultValue": "[concat('ContosoPhoneRadio-', uniqueString(resourceGroup().id))]",
-            "metadata": {
-                "description": "The name of you Web App."
-            }
-        },
-        "location": {
-            "type": "string",
-            "defaultValue": "[resourceGroup().location]",
-            "metadata": {
-                "description": "Location for all resources."
-            }
-        },
-        "sku": {
-            "type": "string",
-            "defaultValue": "F1",
-            "metadata": {
-                "description": "The pricing tier for the hosting plan."
-            }
-        },
-        "workerSize": {
-            "type": "string",
-            "allowedValues": [
-                "0",
-                "1",
-                "2"
-            ],
-            "defaultValue": "0",
-            "metadata": {
-                "description": "The instance size of the hosting plan (small, medium, or large)."
-            }
-        },
-        "repoURL": {
-            "type": "string",
-            "defaultValue": "https://github.com/minwoolee-msft/contoso-phone-radio.git",
-            "metadata": {
-                "description": "The URL for the GitHub repository that contains the project to deploy."
-            }
-        },
-        "branch": {
-            "type": "string",
-            "defaultValue": "master",
-            "metadata": {
-                "description": "The branch of the GitHub repository to use."
-            }
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.1",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "[concat('ContosoPhoneRadio-', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "The name of you Web App."
+      }
     },
-    "variables": {
-        "hostingPlanName": "[concat('hpn-', resourceGroup().name)]"
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
     },
-    "resources": [
+    "sku": {
+      "type": "string",
+      "defaultValue": "F1",
+      "metadata": {
+        "description": "The pricing tier for the hosting plan."
+      }
+    },
+    "workerSize": {
+      "type": "string",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ],
+      "defaultValue": "0",
+      "metadata": {
+        "description": "The instance size of the hosting plan (small, medium, or large)."
+      }
+    },
+    "branch": {
+      "type": "string",
+      "defaultValue": "master",
+      "metadata": {
+        "description": "The branch of the GitHub repository to use."
+      }
+    },
+    "azureCommunicationServicesResourceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide name of your Azure Communication Services resource. If you do not have Azure Communication Resource, Please provision first."
+      }
+    },
+    "systemTopicName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the system topic.  If you have an existing topic, find it under 'Events' in your Azure Communication Services resource, otherwise specify a unique name"
+      }
+    },
+    "eventSubName": {
+      "type": "string",
+      "defaultValue": "IncomingCallSubscription",
+      "metadata": {
+        "description": "Provide a name for the Event Grid subscription."
+      }
+    }
+  },
+  "variables": {
+    "hostingPlanName": "[concat('hpn-', resourceGroup().name)]",
+    "repoURL": "https://github.com/minwoolee-msft/contoso-phone-radio.git"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-12-01",
+      "name": "[variables('hostingPlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sku')]",
+        "capacity": "[parameters('workerSize')]"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-12-01",
+      "name": "[parameters('webAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      ],
+      "properties": {
+        "id": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      },
+      "resources": [
         {
-            "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2020-12-01",
-            "name": "[variables('hostingPlanName')]",
-            "location": "[parameters('location')]",
-            "sku": {
-                "name": "[parameters('sku')]",
-                "capacity": "[parameters('workerSize')]"
-            },
-            "properties": {
-                "name": "[variables('hostingPlanName')]"
-            }
-        },
-        {
-            "type": "Microsoft.Web/sites",
-            "apiVersion": "2020-12-01",
-            "name": "[parameters('webAppName')]",
-            "location": "[parameters('location')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-            ],
-            "properties": {
-                "id": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
-            },
-            "resources": [
-                {
-                    "type": "sourcecontrols",
-                    "apiVersion": "2020-12-01",
-                    "name": "web",
-                    "location": "[parameters('location')]",
-                    "dependsOn": [
-                        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
-                    ],
-                    "properties": {
-                        "repoUrl": "[parameters('repoURL')]",
-                        "branch": "[parameters('branch')]",
-                        "isManualIntegration": true
-                    }
-                }
-            ]
+          "type": "sourcecontrols",
+          "apiVersion": "2020-12-01",
+          "name": "web",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+          ],
+          "properties": {
+            "repoUrl": "[parameters('repoURL')]",
+            "branch": "[parameters('branch')]",
+            "isManualIntegration": true
+          }
         }
-    ]
+      ]
+    },
+    {
+      "type": "Microsoft.EventGrid/systemTopics",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[parameters('systemTopicName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "source": "[resourceId('Microsoft.Communication/CommunicationServices', parameters('azureCommunicationServicesResourceName'))]",
+        "topicType": "Microsoft.Communication.CommunicationServices"
+      }
+    },
+    {
+      "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[concat(parameters('systemTopicName'), '/', parameters('eventSubName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]",
+        "[resourceId('Microsoft.EventGrid/systemTopics', parameters('systemTopicName'))]"
+      ],
+      "properties": {
+        "destination": {
+          "endpointType": "WebHook",
+          "properties": {
+            "endpointUrl": "[concat('https://', parameters('webAppName'), '.azurewebsites.net/incomingcall')]"
+          }
+        },
+        "eventDeliverySchema": "EventGridSchema",
+        "filter": {
+          "includedEventTypes": [
+            "Microsoft.Communication.IncomingCall"
+          ]
+        }
+      }
+    }
+  ]
 }
