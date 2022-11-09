@@ -1,0 +1,181 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.1",
+  "parameters": {
+    "webAppName": {
+      "type": "string",
+      "defaultValue": "[concat('ContosoPhoneRadio-', uniqueString(resourceGroup().id))]",
+      "metadata": {
+        "description": "The name of you Web App."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "F1",
+      "metadata": {
+        "description": "The pricing tier for the hosting plan."
+      }
+    },
+    "workerSize": {
+      "type": "string",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ],
+      "defaultValue": "0",
+      "metadata": {
+        "description": "The instance size of the hosting plan (small, medium, or large)."
+      }
+    },
+    "branch": {
+      "type": "string",
+      "defaultValue": "main",
+      "metadata": {
+        "description": "The branch of the GitHub repository to use."
+      }
+    },
+    "azureCommunicationServicesResourceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Provide name of your Azure Communication Services resource. If you do not have Azure Communication Resource, Please provision first."
+      }
+    },
+    "provisionSystemTopic": {
+        "type": "string",
+        "allowedValues": [
+            "Yes",
+            "No"
+        ],
+        "metadata": {
+            "description": "If you do not have event grid topic associated with ACS, say YES. If you already have the topic associated with your ACS, say NO."
+        }
+    },
+    "systemTopicName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the system topic.  If you have an existing topic, find it under 'Events' in your Azure Communication Services resource, otherwise specify a unique name"
+      }
+    },
+    "eventSubName": {
+      "type": "string",
+      "defaultValue": "IncomingCallSubscription",
+      "metadata": {
+        "description": "Provide a name for the Event Grid subscription."
+      },
+      "musicToPlay": {
+        "type": "string",
+        "defaultValue": "https://github.com/minwoolee-msft/contoso-phone-radio/raw/main/media/CanonDMajor.wav",
+        "metadata": {
+          "description": "Music .wav file that will be playing when you call in. We provided sample wav file for you, but you may change if you would like."
+        }
+      }
+    }
+  },
+  "variables": {
+    "hostingPlanName": "[concat('hpn-', resourceGroup().name)]",
+    "repoURL": "https://github.com/minwoolee-msft/contoso-phone-radio.git"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2020-12-01",
+      "name": "[variables('hostingPlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('sku')]",
+        "capacity": "[parameters('workerSize')]"
+      },
+      "properties": {
+        "name": "[variables('hostingPlanName')]"
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2020-12-01",
+      "name": "[parameters('webAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      ],
+      "properties": {
+        "id": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+      },
+      "resources": [
+        {
+          "type": "sourcecontrols",
+          "apiVersion": "2020-12-01",
+          "name": "web",
+          "location": "[parameters('location')]",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+          ],
+          "properties": {
+            "repoUrl": "[variables('repoURL')]",
+            "branch": "[parameters('branch')]",
+            "isManualIntegration": true
+          }
+        },
+		    {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2020-12-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
+          ],
+          "tags": {
+            "displayName": "appsettings"
+          },
+          "properties": {
+            "AppServiceEndpoint": "[concat('https://', parameters('webAppName'), '.azurewebsites.net')]",
+            "AzureCommunicationServiceKey": "[concat(concat('endpoint=https://', parameters('azureCommunicationServicesResourceName'), '.communication.azure.com/;accesskey='), listKeys(resourceId('Microsoft.Communication/CommunicationServices', parameters('azureCommunicationServicesResourceName')), '2020-08-20-preview').primaryKey)]",
+            "PlayMediaFileEndpoint": "[parameters('musicToPlay')]"
+          }
+        }
+      ]
+    },
+    {
+      "condition": "[equals(parameters('provisionSystemTopic'), 'Yes')]",
+      "type": "Microsoft.EventGrid/systemTopics",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[parameters('systemTopicName')]",
+      "location": "global",
+      "properties": {
+        "source": "[resourceId('Microsoft.Communication/CommunicationServices', parameters('azureCommunicationServicesResourceName'))]",
+        "topicType": "Microsoft.Communication.CommunicationServices"
+      }
+    },
+    {
+      "type": "Microsoft.EventGrid/systemTopics/eventSubscriptions",
+      "apiVersion": "2021-06-01-preview",
+      "name": "[concat(parameters('systemTopicName'), '/', parameters('eventSubName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]",
+        "[resourceId('Microsoft.Web/sites/config/', parameters('webAppName'), 'appsettings')]",
+        "[resourceId('Microsoft.EventGrid/systemTopics', parameters('systemTopicName'))]",
+        "[resourceId('Microsoft.Web/sites/sourcecontrols', parameters('webAppName'), 'web')]"
+      ],
+      "properties": {
+        "destination": {
+          "endpointType": "WebHook",
+          "properties": {
+            "endpointUrl": "[concat('https://', parameters('webAppName'), '.azurewebsites.net/IncomingCallEvents')]"
+          }
+        },
+        "eventDeliverySchema": "EventGridSchema",
+        "filter": {
+          "includedEventTypes": [
+            "Microsoft.Communication.IncomingCall"
+          ]
+        }
+      }
+    }
+  ]
+}
