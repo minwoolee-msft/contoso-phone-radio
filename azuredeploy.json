@@ -111,7 +111,7 @@
           "type": "config",
           "apiVersion": "2020-12-01",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+            "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]"
           ],
           "tags": {
             "displayName": "appsettings"
