@@ -111,7 +111,7 @@
           },
           "properties": {
             "AppServiceEndpoint": "[concat('https://', parameters('webAppName'), '.azurewebsites.net')]",
-            "AzureCommunicationServiceKey": "[concat('endpoint=https://', parameters('azureCommunicationServicesResourceName'), '.communication.azure.com/;accesskey=', [listKeys(resourceId('Microsoft.Communication/CommunicationServices', parameters('azureCommunicationServicesResourceName')), '2020-08-20-preview').primaryKey])]",
+            "AzureCommunicationServiceKey": "[concat(concat('endpoint=https://', parameters('azureCommunicationServicesResourceName'), '.communication.azure.com/;accesskey='), listKeys(resourceId('Microsoft.Communication/CommunicationServices', parameters('azureCommunicationServicesResourceName')), '2020-08-20-preview').primaryKey)]",
             "PlayMediaFileEndpoint": "https://acstestapp1.azurewebsites.net/audio/bot-hold-music-2.wav"
           }
         }
