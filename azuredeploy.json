@@ -105,6 +105,22 @@
             "branch": "[parameters('branch')]",
             "isManualIntegration": true
           }
+        },
+		    {
+          "name": "appsettings",
+          "type": "config",
+          "apiVersion": "2020-12-01",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+          ],
+          "tags": {
+            "displayName": "appsettings"
+          },
+          "properties": {
+            "AppServiceEndpoint": "[concat('https://', parameters('webAppName'), '.azurewebsites.net')]",
+            "AzureCommunicationServiceKey": "[listKeys(resourceId('Microsoft.Communication/CommunicationServices', parameters('azureCommunicationServicesResourceName')), '2020-08-20-preview').primaryKey]",
+            "PlayMediaFileEndpoint": "https://acstestapp1.azurewebsites.net/audio/bot-hold-music-2.wav"
+          }
         }
       ]
     },
@@ -130,7 +146,7 @@
         "destination": {
           "endpointType": "WebHook",
           "properties": {
-            "endpointUrl": "[concat('https:\/\/', parameters('webAppName'), '.azurewebsites.net\/incomingcall')]"
+            "endpointUrl": "[concat('https://', parameters('webAppName'), '.azurewebsites.net/IncomingCallEvents')]"
           }
         },
         "eventDeliverySchema": "EventGridSchema",
