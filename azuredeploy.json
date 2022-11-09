@@ -140,6 +140,7 @@
       "name": "[concat(parameters('systemTopicName'), '/', parameters('eventSubName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]",
+        "[resourceId('Microsoft.Web/sites/config/', parameters('webAppName'), 'appsettings')]",
         "[resourceId('Microsoft.EventGrid/systemTopics', parameters('systemTopicName'))]"
       ],
       "properties": {
