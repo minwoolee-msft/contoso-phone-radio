@@ -72,7 +72,7 @@
       },
       "musicToPlay": {
         "type": "string",
-        "defaultValue": "https://acstestapp1.azurewebsites.net/audio/bot-hold-music-2.wav",
+        "defaultValue": "https://github.com/minwoolee-msft/contoso-phone-radio/raw/main/media/CanonDMajor.wav",
         "metadata": {
           "description": "Music .wav file that will be playing when you call in. We provided sample wav file for you, but you may change if you would like."
         }
