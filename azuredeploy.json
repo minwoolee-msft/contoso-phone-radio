@@ -152,7 +152,8 @@
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', parameters('webAppName'))]",
         "[resourceId('Microsoft.Web/sites/config/', parameters('webAppName'), 'appsettings')]",
-        "[resourceId('Microsoft.EventGrid/systemTopics', parameters('systemTopicName'))]"
+        "[resourceId('Microsoft.EventGrid/systemTopics', parameters('systemTopicName'))]",
+        "[resourceId('Microsoft.Web/sites/sourcecontrols/', parameters('webAppName'))]"
       ],
       "properties": {
         "destination": {
