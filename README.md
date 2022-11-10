@@ -18,20 +18,19 @@ Contoso Phone Radio is simple service that will accept phonecall, and then play 
 ## Option 1: Deploy the Demo to Azure Web Apps
 
 1. Make sure above Prerequisites are met.
-2. Fork this repository to your GitHub Account.
-3. Click on the **Deploy to Azure** Button
+2. Click on the **Deploy to Azure** Button
 
     [![Deploy To Azure](https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/1-CONTRIBUTION-GUIDE/images/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3a%2f%2fraw.githubusercontent.com%2fminwoolee-msft%2fcontoso-phone-radio%2fmain%2fazuredeploy.json)
 
-4. Fill out the values in the Deployment page
+3. Fill out the values in the Deployment page
    - **Subscription / Resource Group**: Select your provisioned Subscription and Resource group here.
    - **Azure Communication Services Resource Name**: Name of your pre-provisioned ACS resource.
    - **Provision System Topic**: If you do not have EventGrid system topic created under ACS resource above, select YES. If you already have EventGrid system topic, select NO.
    - **System Topic Name**: Provide any unique name if you have selected YES above. If you already have EventGrid system topic under ACS, provide that name.
 
-5. Review + Create.
-6. Wait until provision finishes. May take up few minutes.
-7. Once it is complete, You can test it by calling the PSTN phone number provisioned in Prerequisites.
+4. Review + Create.
+5. Wait until provision finishes. May take up few minutes.
+6. Once it is complete, You can test it by calling the PSTN phone number provisioned in Prerequisites.
 
 ## Option 2: Test the Demo on your Local Computer
 
