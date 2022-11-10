@@ -25,7 +25,6 @@ Contoso Phone Radio is simple service that will accept phonecall, and then play 
 
 4. Fill out the values in the Deployment page
    - **Subscription / Resource Group**: Select your provisioned Subscription and Resource group here.
-   - **Branch**: Name of your forked branch above. 
    - **Azure Communication Services Resource Name**: Name of your pre-provisioned ACS resource.
    - **Provision System Topic**: If you do not have EventGrid system topic created under ACS resource above, select YES. If you already have EventGrid system topic, select NO.
    - **System Topic Name**: Provide any unique name if you have selected YES above. If you already have EventGrid system topic under ACS, provide that name.
@@ -40,17 +39,16 @@ Contoso Phone Radio is simple service that will accept phonecall, and then play 
 
 
 1. Install latest Visual Studio if you do not have it.
-2. Fork this repository to your GitHub Account, then clone into your local computer
-3. Allow your localhost to accept incoming HTTP callbacks. You can use service like ngrok to have your localhost accessible to public network. This is required to accept events.
-4. Get Envrionment Variable of the followings added in your Visual Studio
+2. Allow your localhost to accept incoming HTTP callbacks. You can use service like ngrok to have your localhost accessible to public network. This is required to accept events.
+3. Get Envrionment Variable of the followings added in your Visual Studio
    - **AppServiceEndpoint**: your public endpoint from above ngrok.
    - **AzureCommunicationServiceKey**: your ACS resource connection string.
    - **PlayMediaFileEndpoint**: music .wav file to be played.
-5. Start your service
-6. On ACS portal, go events, create new webhook event with Incoming Call.
-7. Webhook end point will be your public endpoint + /incomingcallevents. (i.e. https://contoso.com/incomingcallevents)
-8. Verify that your incoming call eventgrid is successful on portal.
-9. You can test it by calling the PSTN phone number provisioned in Prerequisites.
+4. Start your service
+5. On ACS portal, go events, create new webhook event with Incoming Call.
+6. Webhook end point will be your public endpoint + /incomingcallevents. (i.e. https://contoso.com/incomingcallevents)
+7. Verify that your incoming call eventgrid is successful on portal.
+8. You can test it by calling the PSTN phone number provisioned in Prerequisites.
 
 ## Resources
 - [Call Automation Overview](https://learn.microsoft.com/azure/communication-services/concepts/voice-video-calling/call-automation)
