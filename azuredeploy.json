@@ -69,13 +69,13 @@
       "defaultValue": "IncomingCallSubscription",
       "metadata": {
         "description": "Provide a name for the Event Grid subscription."
-      },
-      "musicToPlay": {
-        "type": "string",
-        "defaultValue": "https://github.com/minwoolee-msft/contoso-phone-radio/raw/main/media/CanonDMajor.wav",
-        "metadata": {
-          "description": "Music .wav file that will be playing when you call in. We provided sample wav file for you, but you may change if you would like."
-        }
+      }
+    },
+    "musicToPlay": {
+      "type": "string",
+      "defaultValue": "https://github.com/minwoolee-msft/contoso-phone-radio/raw/main/media/CanonDMajor.wav",
+      "metadata": {
+        "description": "Music .wav file that will be playing when you call in. We provided sample wav file for you, but you may change if you would like."
       }
     }
   },
